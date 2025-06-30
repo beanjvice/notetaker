@@ -1,0 +1,24 @@
+{
+  "name": "notetaker",
+  "version": "1.0.0",
+  "description": "note taker project - arisa, nadia, anna",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beanjvice/notetaker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beanjvice/notetaker/issues"
+  },
+  "homepage": "https://github.com/beanjvice/notetaker#readme",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0"
+  }
+}
