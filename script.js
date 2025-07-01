@@ -6,57 +6,39 @@ const notesBody = document.querySelector(".notes_body");
 let notes = [];
 let activeNoteId = null;
 
-function renderNotesList() {
-    notesList.innerHTML = "";
-
-    notes.forEach(note => {
-        const item = document.createElement("div");
-        item.classList.add("list_item");
-        if (note.id === activeNoteId) {
-            item.classList.add("list_item--selected--selected");
-        }
-
-        item.innerHTML = `
-            <div class="item_title">${note.title || "Untitled"}</div>
-            <div class="item_">${note.body.substring(0, 30)}...</div>
-            <button class="delete-btn">🗑️</button>
-        `;
-
-        // Select note
-        item.addEventListener("click", () => {
-            setActiveNote(note.id);
-        });
-
-        // Prevent click when delete button is clicked
-        item.querySelector(".delete-btn").addEventListener("click", (e) => {
-            e.stopPropagation();
-            deleteNote(note.id);
-        });
-
-        notesList.appendChild(item);
-    });
-}
-
-function setActiveNote(id) {
-    activeNoteId = id;
-    const note = notes.find(n => n.id === id);
-    notesTitle.value = note.title;
-    notesBody.value = note.body;
+async function loadNotes() {
+    const res = await fetch("/notes");
+    notes = await res.json();
+    if (notes.length > 0) {
+        setActiveNote(notes[0].id);
+    } else {
+        notesTitle.value = "";
+        notesBody.value = "";
+    }
     renderNotesList();
 }
 
-function addNote() {
+async function addNote() {
     const newNote = {
         id: Date.now().toString(),
-        title: "New Note",
-        body: ""
+        title: notesTitle.value || "Untitled",
+        body: notesBody.value || ""
     };
-    notes.unshift(newNote);
-    setActiveNote(newNote.id);
+    const res = await fetch("/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newNote)
+    });
+    const savedNote = await res.json();
+    notes.unshift(savedNote);
+    setActiveNote(savedNote.id);
     renderNotesList();
 }
 
-function deleteNote(id) {
+async function deleteNote(id) {
+    await fetch(`/notes/${id}`, {
+        method: "DELETE"
+    });
     notes = notes.filter(n => n.id !== id);
     if (activeNoteId === id) {
         activeNoteId = notes.length ? notes[0].id : null;
@@ -70,6 +52,43 @@ function deleteNote(id) {
         notesBody.value = "";
     }
     renderNotesList();
+}
+
+function setActiveNote(id) {
+    activeNoteId = id;
+    const note = notes.find(n => n.id === id);
+    notesTitle.value = note.title;
+    notesBody.value = note.body;
+    renderNotesList();
+}
+
+function renderNotesList() {
+    notesList.innerHTML = "";
+
+    notes.forEach(note => {
+        const item = document.createElement("div");
+        item.classList.add("list_item");
+        if (note.id === activeNoteId) {
+            item.classList.add("list_item--selected--selected");
+        }
+
+        item.innerHTML = `
+            <div class="item_title">${note.title || "Untitled"}</div>
+            <div class="item_body">${note.body.substring(0, 30)}...</div>
+            <button class="delete-btn">🗑️</button>
+        `;
+
+        item.addEventListener("click", () => {
+            setActiveNote(note.id);
+        });
+
+        item.querySelector(".delete-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            deleteNote(note.id);
+        });
+
+        notesList.appendChild(item);
+    });
 }
 
 notesTitle.addEventListener("input", () => {
@@ -90,7 +109,4 @@ notesBody.addEventListener("input", () => {
 
 addButton.addEventListener("click", addNote);
 
-// Initial state
-renderNotesList();
-notesTitle.value = "";
-notesBody.value = "";
+window.addEventListener("DOMContentLoaded", loadNotes);
