@@ -45,12 +45,17 @@
 
 .list_item {
     cursor: pointer;
+    margin-bottom: 25px; /* adjust spacing as needed */
+
 }
 
 .list_item--selected--selected {
     background: #eeeeee;
     border-radius: 7px;
     font-weight: bold;
+    font-size: 15px;
+    padding: 20px;
+    padding-bottom: 30px;
 }
 
 .item_title {
@@ -97,4 +102,13 @@
     resize: none;
 }
 
+.delete-btn {
+    background: transparent;
+    border: none;
+    color: red;
+    font-size: 18px;
+    cursor: pointer;
+    float: right;
+
+}
 
